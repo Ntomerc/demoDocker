@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  node1:
+    container_name: node1
+    build:
+      context: Node1
+      platform: linux/amd64
+    command: python3 -u main.py
+    volumes:
+      - ./Node1:/app
+    depends_on:
+      - communitysolidserver
+    network_mode: host
+
+  node2:
+    container_name: node2
+    build:
+      context: Node2
+      platform: linux/amd64
+    command: python3 -u main.py
+    volumes:
+      - ./Node2:/app
+    depends_on:
+      - communitysolidserver
+    network_mode: host
+
+  communitysolidserver:
+    image: solidproject/community-server:latest
+    container_name: solid_server
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - ./.env
+    volumes:
+      - poddata:/poddata
+      - ./SolidServer/unsafe.json:/community-server/unsafe.json
+    command:
+     - -c${CONFIG_PATH}
+
+volumes:
+  poddata:
